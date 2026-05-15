@@ -13,12 +13,23 @@ This installs the TUI to `~/.team-manager-tui` and creates a `team-manager-tui` 
 ## Usage
 
 ```bash
-# Connect to local API (default)
+# Connect to local API (no auth)
 team-manager-tui
 
-# Connect to a remote API
-TEAM_MANAGER_API_URL=https://your-api.com team-manager-tui
+# Connect to a remote API with an API key
+TEAM_MANAGER_API_URL=https://your-api.com \
+TEAM_MANAGER_API_KEY=your-key-here \
+team-manager-tui
 ```
+
+### Setting up an API Key
+
+1. Log into the Team Manager web app
+2. Go to **Profile** (sidebar) → **API Keys**
+3. Click **Create Key** and copy the generated key
+4. Use it with the `TEAM_MANAGER_API_KEY` env var
+
+> You can also add `export TEAM_MANAGER_API_KEY=your-key` to your `~/.bashrc` or `~/.zshrc` so it's always available.
 
 ## Key Bindings
 
