@@ -5,8 +5,15 @@ from typing import Any
 import httpx
 
 BASE_URL = os.environ.get("TEAM_MANAGER_API_URL", "http://localhost:5000")
+API_KEY = os.environ.get("TEAM_MANAGER_API_KEY")
 
 _client: httpx.AsyncClient | None = None
+
+
+def _headers() -> dict[str, str]:
+    if API_KEY:
+        return {"X-API-Key": API_KEY}
+    return {}
 
 
 def client() -> httpx.AsyncClient:
@@ -17,7 +24,13 @@ def client() -> httpx.AsyncClient:
 
 
 async def _get(path: str, params: dict | None = None) -> Any:
-    r = await client().get(path, params={k: v for k, v in (params or {}).items() if v is not None})
+    r = await client().get(path, params={k: v for k, v in (params or {}).items() if v is not None}, headers=_headers())
+    r.raise_for_status()
+    return r.json()
+
+
+async def _post(path: str, json: dict | None = None) -> Any:
+    r = await client().post(path, json=json, headers=_headers())
     r.raise_for_status()
     return r.json()
 
@@ -44,9 +57,7 @@ async def get_work_items(sprint_member_id: str) -> list[dict]:
 
 async def create_feature(sprint_id: str, payload: dict) -> dict:
     body = {k: v for k, v in payload.items() if v is not None}
-    r = await client().post(f"/api/v1/sprints/{sprint_id}/features", json=body)
-    r.raise_for_status()
-    return r.json()
+    return await _post(f"/api/v1/sprints/{sprint_id}/features", json=body)
 
 
 async def load_dashboard_data(sprint_id: str) -> tuple[dict, list[dict], dict | None]:

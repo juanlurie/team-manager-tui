@@ -108,6 +108,7 @@ cat > "${CLI_BIN}" << 'WRAPPER'
 # Team Manager TUI — auto-generated wrapper
 INSTALL_DIR="${HOME}/.team-manager-tui"
 export TEAM_MANAGER_API_URL="${TEAM_MANAGER_API_URL:-http://localhost:5000}"
+export TEAM_MANAGER_API_KEY="${TEAM_MANAGER_API_KEY:-}"
 cd "${INSTALL_DIR}"
 exec "${INSTALL_DIR}/venv/bin/python3" "${INSTALL_DIR}/app.py" "$@"
 WRAPPER

@@ -77,7 +77,8 @@ class TeamManagerApp(App):
             self.query_one("#loading", Label).update(
                 f"[red]Cannot connect to API at {api.BASE_URL}\n{exc}[/]\n\n"
                 "Make sure the Team Manager API is running.\n"
-                "Set TEAM_MANAGER_API_URL to override the base URL."
+                "Set TEAM_MANAGER_API_URL to override the base URL.\n"
+                "Set TEAM_MANAGER_API_KEY if your API requires authentication."
             )
             return
 
