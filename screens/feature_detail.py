@@ -126,13 +126,14 @@ class FeatureDetailScreen(Screen):
 
     def action_add_task(self) -> None:
         from screens.add_task import AddTaskModal
+        modal = AddTaskModal(self._members)
 
         def on_result(payload: dict | None) -> None:
             if not payload:
                 return
             self.run_worker(self._create_task(payload), exclusive=False)
 
-        self.app.push_screen(AddTaskModal(), callback=on_result)
+        self.app.push_screen(modal, callback=on_result)
 
     async def _create_task(self, payload: dict) -> None:
         import api

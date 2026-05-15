@@ -72,6 +72,10 @@ class AddTaskModal(ModalScreen[dict | None]):
     }
     """
 
+    def __init__(self, members: list[dict]) -> None:
+        super().__init__()
+        self._members = members
+
     def compose(self) -> ComposeResult:
         with Vertical(id="dialog"):
             yield Static("Add Task", id="dialog-title")
@@ -94,9 +98,7 @@ class AddTaskModal(ModalScreen[dict | None]):
 
     def on_mount(self) -> None:
         self.query_one("#title", Input).focus()
-
-    def set_assignees(self, members: list[dict]) -> None:
-        options = [(m.get("fullName") or "?", m.get("sprintMemberId") or "") for m in members]
+        options = [(m.get("fullName") or "?", m.get("sprintMemberId") or "") for m in self._members]
         select = self.query_one("#assignee", Select)
         select.set_options(options)
         if options:
