@@ -25,6 +25,8 @@ class FeatureDetailScreen(Screen):
     BINDINGS = [
         Binding("b", "go_back", "Back", show=True),
         Binding("escape", "go_back", "Back", show=False),
+        Binding("a", "add_task", "Add task", show=True),
+        Binding("r", "refresh", "Refresh", show=True),
         Binding("q", "quit", "Quit", show=True),
     ]
 
@@ -41,10 +43,12 @@ class FeatureDetailScreen(Screen):
     TabPane { padding: 0 1; }
     """
 
-    def __init__(self, feature: dict, members: list[dict], sprint_name: str) -> None:
+    def __init__(self, feature: dict, members: list[dict], sprint_id: str, sprint_name: str) -> None:
         super().__init__()
         self._feature = feature
+        self._sprint_id = sprint_id
         self._sprint_name = sprint_name
+        self._members = members
         self._title = feature.get("title") or "Unplanned"
         self._feature_id = feature.get("id")  # None for unplanned
         # Collect all work items that belong to this feature across all members
@@ -119,6 +123,60 @@ class FeatureDetailScreen(Screen):
 
     def action_go_back(self) -> None:
         self.app.pop_screen()
+
+    def action_add_task(self) -> None:
+        from screens.add_task import AddTaskModal
+
+        def on_result(payload: dict | None) -> None:
+            if not payload:
+                return
+            self.run_worker(self._create_task(payload), exclusive=False)
+
+        self.app.push_screen(AddTaskModal(), callback=on_result)
+
+    async def _create_task(self, payload: dict) -> None:
+        import api
+        sprint_member_id = payload.pop("sprintMemberId")
+        payload["featureId"] = self._feature_id
+        try:
+            await api.create_work_item(sprint_member_id, payload)
+        except Exception as exc:
+            self.app.notify(str(exc), title="Failed to create task", severity="error", timeout=8)
+            return
+        self.app.notify("Task created", severity="information", timeout=3)
+        self.action_refresh()
+
+    def action_refresh(self) -> None:
+        import api
+        for group_name in STATUS_GROUPS:
+            tbl_id = f"tbl-{group_name.replace(' ', '-').lower()}"
+            tbl = self.query_one(f"#{tbl_id}", DataTable)
+            tbl.clear()
+        self._work_items = []
+        self.query_one("#feature-header", Static).update(
+            f"  {self._title}  –  {self._sprint_name}  [dim]Refreshing…[/]"
+        )
+        self.run_worker(self._reload_data(), exclusive=True)
+
+    async def _reload_data(self) -> None:
+        import api
+        try:
+            dashboard = await api.get_sprint_dashboard(self._sprint_id)
+        except Exception as exc:
+            self.query_one("#feature-header", Static).update(
+                f"  [red]Error: {exc}[/]"
+            )
+            return
+        members = dashboard.get("members") or []
+        self._work_items = []
+        for m in members:
+            for wi in m.get("workItems") or []:
+                if wi.get("featureId") == self._feature_id:
+                    self._work_items.append({**wi, "_memberName": m.get("fullName") or "?"})
+        self._populate()
+        self.query_one("#feature-header", Static).update(
+            f"  {self._title}  –  {self._sprint_name}"
+        )
 
     def action_quit(self) -> None:
         self.app.exit()

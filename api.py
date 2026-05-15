@@ -60,6 +60,11 @@ async def create_feature(sprint_id: str, payload: dict) -> dict:
     return await _post(f"/api/v1/sprints/{sprint_id}/features", json=body)
 
 
+async def create_work_item(sprint_member_id: str, payload: dict) -> dict:
+    body = {k: v for k, v in payload.items() if v is not None}
+    return await _post(f"/api/v1/sprint-members/{sprint_member_id}/work-items", json=body)
+
+
 async def load_dashboard_data(sprint_id: str) -> tuple[dict, list[dict], dict | None]:
     """Fetch dashboard, blockers, and leave summary in parallel."""
     return await asyncio.gather(

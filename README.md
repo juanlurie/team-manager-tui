@@ -33,11 +33,21 @@ team-manager-tui
 
 ## Key Bindings
 
+### Dashboard
+
 | Key | Action |
 |-----|--------|
 | `[` / `]` | Navigate between sprints |
 | `n` | Add new feature |
-| `Enter` | Open feature detail / work items |
+| `Enter` | Open feature detail |
+| `r` | Refresh data |
+| `q` | Quit |
+
+### Feature Detail
+
+| Key | Action |
+|-----|--------|
+| `a` | Add task to feature |
 | `r` | Refresh data |
 | `b` / `Esc` | Go back |
 | `q` | Quit |

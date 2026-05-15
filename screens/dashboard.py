@@ -258,9 +258,10 @@ class DashboardScreen(Screen):
         if not feature.get("id") and not feature.get("isUnplanned"):
             return
         members: list[dict] = self._dashboard.get("members") or []
+        sprint_id = self._sprint.get("id", "")
         sprint_name = self._sprint.get("name", "Sprint")
         from screens.feature_detail import FeatureDetailScreen
-        self.app.push_screen(FeatureDetailScreen(feature, members, sprint_name))
+        self.app.push_screen(FeatureDetailScreen(feature, members, sprint_id, sprint_name))
 
     def action_refresh(self) -> None:
         tbl = self.query_one("#features-table", DataTable)
