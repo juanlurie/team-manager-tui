@@ -72,3 +72,38 @@ async def load_dashboard_data(sprint_id: str) -> tuple[dict, list[dict], dict | 
         get_sprint_blockers(sprint_id),
         get_leave_summary(sprint_id),
     )
+
+
+async def _put(path: str, json: dict | None = None) -> Any:
+    r = await client().put(path, json=json, headers=_headers())
+    r.raise_for_status()
+    return r.json()
+
+
+async def _delete(path: str) -> None:
+    r = await client().delete(path, headers=_headers())
+    r.raise_for_status()
+
+
+async def get_me() -> dict:
+    return await _get("/api/auth/me")
+
+
+async def get_timesheet_config(member_id: str) -> dict:
+    return await _get(f"/api/v1/team-members/{member_id}/timesheet-config")
+
+
+async def get_timesheets(member_id: str, year: int, month: int) -> list[dict]:
+    return await _get(f"/api/v1/team-members/{member_id}/timesheets", {"year": year, "month": month})
+
+
+async def create_timesheet_entry(member_id: str, payload: dict) -> dict:
+    return await _post(f"/api/v1/team-members/{member_id}/timesheets", json=payload)
+
+
+async def update_timesheet_entry(member_id: str, entry_id: str, payload: dict) -> dict:
+    return await _put(f"/api/v1/team-members/{member_id}/timesheets/{entry_id}", json=payload)
+
+
+async def delete_timesheet_entry(member_id: str, entry_id: str) -> None:
+    await _delete(f"/api/v1/team-members/{member_id}/timesheets/{entry_id}")

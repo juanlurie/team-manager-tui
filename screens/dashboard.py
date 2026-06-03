@@ -65,6 +65,7 @@ class DashboardScreen(Screen):
         Binding("[", "prev_sprint", "Prev sprint", show=True),
         Binding("]", "next_sprint", "Next sprint", show=True),
         Binding("n", "add_feature", "New feature", show=True),
+        Binding("t", "timesheet", "Timesheet", show=True),
         Binding("r", "refresh", "Refresh", show=True),
         Binding("enter", "open_feature", "Work items", show=True),
         Binding("q", "quit", "Quit", show=True),
@@ -275,6 +276,10 @@ class DashboardScreen(Screen):
 
     def action_next_sprint(self) -> None:
         self.app.action_next_sprint()
+
+    def action_timesheet(self) -> None:
+        from screens.timesheet import TimesheetScreen
+        self.app.push_screen(TimesheetScreen())
 
     def action_quit(self) -> None:
         self.app.exit()
