@@ -37,7 +37,7 @@ done
 command -v python3 >/dev/null 2>&1 || { error "python3 is required but not installed."; exit 1; }
 
 PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
-MIN_VERSION="3.10"
+MIN_VERSION="3.9"
 if [ "$(printf '%s\n' "$MIN_VERSION" "$PYTHON_VERSION" | sort -V | head -n1)" != "$MIN_VERSION" ]; then
     error "Python $MIN_VERSION or higher is required (found $PYTHON_VERSION)."
     exit 1
